@@ -34,7 +34,7 @@ export default function NewStreamPage() {
     if (!appId || !token || !channel) setError("All fields are required.");
     else {
       const slug = slugify(channel);
-      router.push("/" + slug);
+      router.push("/" + slug + "/host");
     }
   }, [appId, token, channel, router]);
 
@@ -93,7 +93,9 @@ export default function NewStreamPage() {
 
       <div className="w-1/2 flex flex-col gap-4">
         <button onClick={handleNextClick}>
-          <PrimaryButton>Next</PrimaryButton>
+          <PrimaryButton>
+            <p className="px-4 py-2">Next</p>
+          </PrimaryButton>
         </button>
         {error && <p className="text-rose-600">{error}</p>}
       </div>
