@@ -14,7 +14,7 @@ export default function LogoSmall() {
           priority
         />
         <h2 className={`${pacifico.className} text-4xl text-stone-500`}>
-          Steam Together
+          Stream Together
         </h2>
       </div>
     </Link>
