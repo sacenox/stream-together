@@ -128,9 +128,9 @@ export default function AgoraHost() {
                 >
                   <SecondaryButton>
                     {audioStarted ? (
-                      <MuteIcon className="p-2" size="3em" />
-                    ) : (
                       <UnmuteIcon className="p-2" size="3em" />
+                    ) : (
+                      <MuteIcon className="p-2" size="3em" />
                     )}
                   </SecondaryButton>
                 </button>

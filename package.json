@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cp -r node_modules/agora-extension-ai-denoiser/external public/external && next dev",
-    "build": "cp -r node_modules/agora-extension-ai-denoiser/external public/external && next build",
+    "dev": "rm -drf public/external; cp -r node_modules/agora-extension-ai-denoiser/external public/external && next dev",
+    "build": "rm -drf public/external; cp -r node_modules/agora-extension-ai-denoiser/external public/external && next build",
     "start": "next start",
     "lint": "next lint"
   },
