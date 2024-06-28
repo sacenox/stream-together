@@ -110,7 +110,7 @@ export default function AgoraHost() {
   const otherHosts = useRemoteUsers();
 
   return (
-    <div className="flex flex-col gap-8 w-full items-center">
+    <div className="flex flex-col md:flex-row gap-8 w-full items-center">
       <div className="rounded-3xl overflow-hidden bg-black w-full max-w-2xl aspect-[4/3]">
         <LocalUser
           audioTrack={localMicrophoneTrack}
