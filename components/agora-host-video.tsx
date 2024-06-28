@@ -83,11 +83,15 @@ export default function AgoraHost() {
 
   const handleBlurBackground = useCallback(() => {
     const enableBlur = async () => {
-      virtualBackgroundRef.current?.setOptions({
-        type: "blur",
-        blurDegree: 2,
-      });
-      virtualBackgroundRef.current?.enable();
+      if (virtualBackgroundRef.current?.enabled) {
+        virtualBackgroundRef.current?.disable();
+      } else {
+        virtualBackgroundRef.current?.setOptions({
+          type: "blur",
+          blurDegree: 2,
+        });
+        virtualBackgroundRef.current?.enable();
+      }
     };
     void enableBlur();
   }, [virtualBackgroundRef]);
@@ -203,10 +207,10 @@ export default function AgoraHost() {
 
           <div>
             <h4 className="font-bold pb-4">Blur your background?</h4>
-            <div className="flex flex-row justify-center">
+            <div className="flex flex-row justify-start">
               <button onClick={handleBlurBackground}>
                 <SecondaryButton>
-                  <p className="px-4 py-2">Yes</p>
+                  <p className="px-4 py-2">Toggle</p>
                 </SecondaryButton>
               </button>
             </div>
