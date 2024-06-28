@@ -110,7 +110,7 @@ export default function AgoraHost() {
   const otherHosts = useRemoteUsers();
 
   return (
-    <div className="flex flex-col md:flex-row gap-8 w-full items-center">
+    <div className="flex flex-col md:flex-row gap-8 w-full justify-center items-center">
       <div className="rounded-3xl overflow-hidden bg-black w-full max-w-2xl aspect-[4/3]">
         <LocalUser
           audioTrack={localMicrophoneTrack}
@@ -153,7 +153,7 @@ export default function AgoraHost() {
                 </button>
               </div>
             ) : callStarted ? (
-              <div>Loading...</div>
+              <div className="p-4">Loading...</div>
             ) : (
               <div className="flex flex-row justify-center gap-4">
                 <button onClick={handleStarCall} title="Go live!">
@@ -168,63 +168,62 @@ export default function AgoraHost() {
             )}
           </div>
         </LocalUser>
-      </div>
+        <Modal
+          openButton={
+            <button onClick={() => setShowSettingsModal(!showSettingsModal)}>
+              <SecondaryButton>
+                <div className="py-2 px-4 flex flex-row gap-2 items-center">
+                  <GearIcon size="2em" />
+                  <p>Settings</p>
+                </div>
+              </SecondaryButton>
+            </button>
+          }
+          showModal={showSettingsModal}
+        >
+          <div className="p-4 bg-stone-800 rounded-2xl flex flex-col gap-4">
+            <div>
+              <h4 className="font-bold pb-4">Select your video device:</h4>
+              {availableCameras.map((c) => {
+                return (
+                  <label key={c.id} className="flex flex-row gap-2">
+                    <input
+                      type="radio"
+                      name="selected-camera"
+                      value={c.id}
+                      checked={c.id === selectedCameraId}
+                      onChange={(e) => {
+                        const id = e.target.value;
+                        setSelectedCameraId(id);
+                      }}
+                    />
+                    <div>{c.label}</div>
+                  </label>
+                );
+              })}
+            </div>
 
-      <Modal
-        openButton={
-          <button onClick={() => setShowSettingsModal(!showSettingsModal)}>
-            <SecondaryButton>
-              <div className="py-2 px-4 flex flex-row gap-2 items-center">
-                <GearIcon size="2em" />
-                <p>Settings</p>
+            <div>
+              <h4 className="font-bold pb-4">Blur your background?</h4>
+              <div className="flex flex-row justify-start">
+                <button onClick={handleBlurBackground}>
+                  <SecondaryButton>
+                    <p className="px-4 py-2">Toggle</p>
+                  </SecondaryButton>
+                </button>
               </div>
-            </SecondaryButton>
-          </button>
-        }
-        showModal={showSettingsModal}
-      >
-        <div className="p-4 bg-stone-800 rounded-2xl flex flex-col gap-4">
-          <div>
-            <h4 className="font-bold pb-4">Select your video device:</h4>
-            {availableCameras.map((c) => {
-              return (
-                <label key={c.id} className="flex flex-row gap-2">
-                  <input
-                    type="radio"
-                    name="selected-camera"
-                    value={c.id}
-                    checked={c.id === selectedCameraId}
-                    onChange={(e) => {
-                      const id = e.target.value;
-                      setSelectedCameraId(id);
-                    }}
-                  />
-                  <div>{c.label}</div>
-                </label>
-              );
-            })}
-          </div>
+            </div>
 
-          <div>
-            <h4 className="font-bold pb-4">Blur your background?</h4>
-            <div className="flex flex-row justify-start">
-              <button onClick={handleBlurBackground}>
-                <SecondaryButton>
-                  <p className="px-4 py-2">Toggle</p>
-                </SecondaryButton>
+            <div className="text-center">
+              <button onClick={() => setShowSettingsModal(false)}>
+                <PrimaryButton>
+                  <p className="px-4 py-2">Close</p>
+                </PrimaryButton>
               </button>
             </div>
           </div>
-
-          <div className="text-center">
-            <button onClick={() => setShowSettingsModal(false)}>
-              <PrimaryButton>
-                <p className="px-4 py-2">Close</p>
-              </PrimaryButton>
-            </button>
-          </div>
-        </div>
-      </Modal>
+        </Modal>
+      </div>
 
       {otherHosts.map((host) => {
         return (
