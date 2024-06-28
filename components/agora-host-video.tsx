@@ -19,6 +19,8 @@ import { GoGear as GearIcon } from "react-icons/go";
 import { IoVideocamOutline as VideoOnIcon } from "react-icons/io5";
 import { IoVideocamOffOutline as VideoOffIcon } from "react-icons/io5";
 
+import useNoiseReduction from "@/hooks/agora-ai-noise-reduction";
+
 import { Modal } from "./modal";
 import PrimaryButton from "./primary-button";
 import SecondaryButton from "./secondary-button";
@@ -51,10 +53,12 @@ export default function AgoraHost() {
     getCameras();
   }, []);
 
-  const { localMicrophoneTrack } = useLocalMicrophoneTrack(audioStarted);
   const { localCameraTrack } = useLocalCameraTrack(videoStarted, {
     cameraId: selectedCameraId,
   });
+
+  const { localMicrophoneTrack } = useLocalMicrophoneTrack(audioStarted);
+  useNoiseReduction({ localMicrophoneTrack });
 
   const isConnected = useIsConnected();
 
@@ -133,7 +137,7 @@ export default function AgoraHost() {
             ) : callStarted ? (
               <div>Loading...</div>
             ) : (
-              <div className="text-center">
+              <div className="flex flex-row justify-center gap-4">
                 <button onClick={handleStarCall} title="Go live!">
                   <PrimaryButton>
                     <div className="flex flex-row items-center px-2 gap-2">
@@ -142,6 +146,54 @@ export default function AgoraHost() {
                     </div>
                   </PrimaryButton>
                 </button>
+                <Modal
+                  openButton={
+                    <button
+                      onClick={() => setShowSettingsModal(!showSettingsModal)}
+                    >
+                      <SecondaryButton>
+                        <div className="py-2 px-4 flex flex-row gap-2 items-center">
+                          <GearIcon size="2em" />
+                          <p>Settings</p>
+                        </div>
+                      </SecondaryButton>
+                    </button>
+                  }
+                  showModal={showSettingsModal}
+                >
+                  <div className="p-4 bg-stone-800 rounded-2xl flex flex-col gap-4">
+                    <div>
+                      <h4 className="font-bold pb-4">
+                        Select your video device:
+                      </h4>
+                      {availableCameras.map((c) => {
+                        return (
+                          <label key={c.id} className="flex flex-row gap-2">
+                            <input
+                              type="radio"
+                              name="selected-camera"
+                              value={c.id}
+                              checked={c.id === selectedCameraId}
+                              onChange={(e) => {
+                                const id = e.target.value;
+                                setSelectedCameraId(id);
+                              }}
+                            />
+                            <div>{c.label}</div>
+                          </label>
+                        );
+                      })}
+                    </div>
+
+                    <div className="text-center">
+                      <button onClick={() => setShowSettingsModal(false)}>
+                        <PrimaryButton>
+                          <p className="px-4 py-2">Close</p>
+                        </PrimaryButton>
+                      </button>
+                    </div>
+                  </div>
+                </Modal>
               </div>
             )}
           </div>
@@ -161,51 +213,6 @@ export default function AgoraHost() {
           </div>
         );
       })}
-
-      <Modal
-        openButton={
-          <button onClick={() => setShowSettingsModal(!showSettingsModal)}>
-            <SecondaryButton>
-              <div className="py-2 px-4 flex flex-row gap-2 items-center">
-                <GearIcon size="2em" />
-                <p>Settings</p>
-              </div>
-            </SecondaryButton>
-          </button>
-        }
-        showModal={showSettingsModal}
-      >
-        <div className="p-4 bg-stone-800 rounded-2xl flex flex-col gap-4">
-          <div>
-            <h4 className="font-bold pb-4">Select your video device:</h4>
-            {availableCameras.map((c) => {
-              return (
-                <label key={c.id} className="flex flex-row gap-2">
-                  <input
-                    type="radio"
-                    name="selected-camera"
-                    value={c.id}
-                    checked={c.id === selectedCameraId}
-                    onChange={(e) => {
-                      const id = e.target.value;
-                      setSelectedCameraId(id);
-                    }}
-                  />
-                  <div>{c.label}</div>
-                </label>
-              );
-            })}
-          </div>
-
-          <div className="text-center">
-            <button onClick={() => setShowSettingsModal(false)}>
-              <PrimaryButton>
-                <p className="px-4 py-2">Close</p>
-              </PrimaryButton>
-            </button>
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 }

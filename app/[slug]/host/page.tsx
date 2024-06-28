@@ -1,10 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaRegCopy as CopyIcon } from "react-icons/fa";
 import { IoMdCheckmark as CheckmarkIcon } from "react-icons/io";
-import { useCopyToClipboard, useLocalStorage } from "usehooks-ts";
+import { useCopyToClipboard } from "usehooks-ts";
 
 const AgoraProvider = dynamic(() => import("@/components/agora-provider"), {
   ssr: false,
@@ -14,14 +14,7 @@ const AgoraHost = dynamic(() => import("@/components/agora-host-video"), {
   ssr: false,
 });
 
-export default function StreamSetupPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const [appId] = useLocalStorage("app-id", "");
-  const [token] = useLocalStorage("token", "");
-  const [channel] = useLocalStorage("channel", "");
+export default function StreamSetupPage() {
   const [currentUrl, setCurrentUrl] = useState("");
   const [copied, copy] = useCopyToClipboard();
 

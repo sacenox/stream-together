@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "cp -r node_modules/agora-extension-ai-denoiser/external public/external && next dev",
+    "build": "cp -r node_modules/agora-extension-ai-denoiser/external public/external && next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "agora-extension-ai-denoiser": "^1.1.0",
     "agora-rtc-react": "^2.2.0",
     "agora-rtc-sdk-ng": "^4.21.0",
     "next": "14.2.4",
