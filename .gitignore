@@ -38,3 +38,6 @@ next-env.d.ts
 # No need to share user settings
 .vscode
 .scrap-paper.md
+
+# We copy these at build time:
+public/external
