@@ -1,4 +1,5 @@
 import Image from "next/image";
+
 import { pacifico } from "./pacifico-font";
 
 export default function Logo() {

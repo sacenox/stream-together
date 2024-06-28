@@ -1,6 +1,7 @@
 import Image from "next/image";
-import { pacifico } from "./pacifico-font";
 import Link from "next/link";
+
+import { pacifico } from "./pacifico-font";
 
 export default function LogoSmall() {
   return (
