@@ -34,7 +34,7 @@ export default function StreamSetupPage({
   return (
     <AgoraProvider>
       <div className="flex flex-col items-center gap-16">
-        <div className="w-1/2 text-center">
+        <div className="max-w-xl w-full text-center">
           <p className="text-lg p-2">
             Share this url with your co-host for them to join you!
           </p>
@@ -52,7 +52,7 @@ export default function StreamSetupPage({
           </button>
         </div>
 
-        <AgoraHost config={{ appId, channel, token }} />
+        <AgoraHost />
       </div>
     </AgoraProvider>
   );

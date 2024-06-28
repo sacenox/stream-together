@@ -23,11 +23,11 @@ import { Modal } from "./modal";
 import PrimaryButton from "./primary-button";
 import SecondaryButton from "./secondary-button";
 
-export default function AgoraHost({
-  config: { appId, channel, token },
-}: {
-  config: { appId: string; channel: string; token: string };
-}) {
+const appId = process.env.NEXT_PUBLIC_APP_ID ?? "";
+const token = process.env.NEXT_PUBLIC_TOKEN ?? "";
+const channel = process.env.NEXT_PUBLIC_CHANNEL ?? "";
+
+export default function AgoraHost() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   const [callStarted, setCallStarted] = useState(false);
@@ -89,7 +89,7 @@ export default function AgoraHost({
 
   return (
     <div className="flex flex-col gap-8 w-full items-center">
-      <div className="rounded-3xl overflow-hidden bg-black w-1/2 h-80">
+      <div className="rounded-3xl overflow-hidden bg-black w-full max-w-2xl aspect-[4/3]">
         <LocalUser
           audioTrack={localMicrophoneTrack}
           videoTrack={localCameraTrack}
@@ -153,7 +153,7 @@ export default function AgoraHost({
         return (
           <div
             key={host.uid}
-            className="rounded-3xl overflow-hidden bg-black w-1/2 h-80"
+            className="rounded-3xl overflow-hidden bg-black w-full max-w-2xl aspect-[4/3]"
           >
             <RemoteUser user={host}>
               <p className="p-4">{host.uid}</p>
