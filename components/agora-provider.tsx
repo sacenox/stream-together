@@ -2,6 +2,7 @@
 
 import { AgoraRTCProvider, IAgoraRTCClient } from "agora-rtc-react";
 import { useEffect, useState } from "react";
+import { ImSpinner10 } from "react-icons/im";
 
 export default function AgoraProvider({
   children,
@@ -26,6 +27,8 @@ export default function AgoraProvider({
   return client ? (
     <AgoraRTCProvider client={client}>{children}</AgoraRTCProvider>
   ) : (
-    <p>There was an error creating agoraio</p>
+    <div className="flex flex-col flex-grow items-center justify-center">
+      <ImSpinner10 size="4rem" className="animate-spin" />
+    </div>
   );
 }

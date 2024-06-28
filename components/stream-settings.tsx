@@ -16,7 +16,7 @@ export default function StreamSettings({
   handleBlurBackground: () => void;
 }>) {
   return (
-    <div className="p-4 bg-stone-800 rounded-2xl flex flex-col gap-4 text-left">
+    <>
       <div>
         <h4 className="font-bold pb-4">Select your video device:</h4>
         {availableCameras.map((c) => {
@@ -48,6 +48,6 @@ export default function StreamSettings({
           </button>
         </div>
       </div>
-    </div>
+    </>
   );
 }

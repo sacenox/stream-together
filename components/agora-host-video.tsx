@@ -20,7 +20,6 @@ import EndStreamButton from "./end-stream-button";
 import { Modal } from "./modal";
 import MuteButton from "./mute-button";
 import PrimaryButton from "./primary-button";
-import SecondaryButton from "./secondary-button";
 import SettingsButton from "./settings-button";
 import StartStreamButton from "./start-stream-button";
 import StreamSettings from "./stream-settings";
@@ -118,9 +117,40 @@ export default function AgoraHost() {
             videoTrack={localCameraTrack}
             cameraOn={videoStarted}
             micOn={audioStarted}
+            playAudio={false}
           >
             <div className="flex flex-col justify-between h-full p-2">
-              <p className="p-2">Your broadcast</p>
+              <div className="flex flex-row justify-between">
+                <p className="p-2">Your broadcast</p>
+
+                <Modal
+                  openButton={
+                    <SettingsButton
+                      showSettingsModal={showSettingsModal}
+                      setShowSettingsModal={setShowSettingsModal}
+                    />
+                  }
+                  showModal={showSettingsModal}
+                >
+                  <div className="p-4 bg-stone-800 rounded-2xl flex flex-col gap-4 text-left">
+                    <StreamSettings
+                      availableCameras={availableCameras}
+                      selectedCameraId={selectedCameraId}
+                      setSelectedCameraId={setSelectedCameraId}
+                      handleBlurBackground={handleBlurBackground}
+                    />
+
+                    <div className="text-center">
+                      <button onClick={() => setShowSettingsModal(false)}>
+                        <PrimaryButton>
+                          <p className="px-4 py-2">Close</p>
+                        </PrimaryButton>
+                      </button>
+                    </div>
+                  </div>
+                </Modal>
+              </div>
+
               {callStarted && isConnected ? (
                 <div className="flex flex-row justify-center gap-4">
                   <MuteButton
@@ -146,32 +176,7 @@ export default function AgoraHost() {
           </LocalUser>
         </div>
 
-        <div className="text-center">
-          <Modal
-            openButton={
-              <SettingsButton
-                showSettingsModal={showSettingsModal}
-                setShowSettingsModal={setShowSettingsModal}
-              />
-            }
-            showModal={showSettingsModal}
-          >
-            <StreamSettings
-              availableCameras={availableCameras}
-              selectedCameraId={selectedCameraId}
-              setSelectedCameraId={setSelectedCameraId}
-              handleBlurBackground={handleBlurBackground}
-            />
-
-            <div className="text-center">
-              <button onClick={() => setShowSettingsModal(false)}>
-                <PrimaryButton>
-                  <p className="px-4 py-2">Close</p>
-                </PrimaryButton>
-              </button>
-            </div>
-          </Modal>
-        </div>
+        <div className="text-center"></div>
       </div>
 
       {otherHosts.map((host) => {
