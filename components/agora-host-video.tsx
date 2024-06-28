@@ -20,6 +20,7 @@ import { IoVideocamOutline as VideoOnIcon } from "react-icons/io5";
 import { IoVideocamOffOutline as VideoOffIcon } from "react-icons/io5";
 
 import useNoiseReduction from "@/hooks/agora-ai-noise-reduction";
+import useVirtualBackground from "@/hooks/agora-virtual-background";
 
 import { Modal } from "./modal";
 import PrimaryButton from "./primary-button";
@@ -77,6 +78,19 @@ export default function AgoraHost() {
   const handleToggleVideo = useCallback(() => {
     setVideoStarted(!videoStarted);
   }, [videoStarted]);
+
+  const virtualBackgroundRef = useVirtualBackground({ localCameraTrack });
+
+  const handleBlurBackground = useCallback(() => {
+    const enableBlur = async () => {
+      virtualBackgroundRef.current?.setOptions({
+        type: "blur",
+        blurDegree: 2,
+      });
+      virtualBackgroundRef.current?.enable();
+    };
+    void enableBlur();
+  }, [virtualBackgroundRef]);
 
   useJoin(
     {
@@ -146,62 +160,69 @@ export default function AgoraHost() {
                     </div>
                   </PrimaryButton>
                 </button>
-                <Modal
-                  openButton={
-                    <button
-                      onClick={() => setShowSettingsModal(!showSettingsModal)}
-                    >
-                      <SecondaryButton>
-                        <div className="py-2 px-4 flex flex-row gap-2 items-center">
-                          <GearIcon size="2em" />
-                          <p>Settings</p>
-                        </div>
-                      </SecondaryButton>
-                    </button>
-                  }
-                  showModal={showSettingsModal}
-                >
-                  <div className="p-4 bg-stone-800 rounded-2xl flex flex-col gap-4">
-                    <div>
-                      <h4 className="font-bold pb-4">
-                        Select your video device:
-                      </h4>
-                      {availableCameras.map((c) => {
-                        return (
-                          <label key={c.id} className="flex flex-row gap-2">
-                            <input
-                              type="radio"
-                              name="selected-camera"
-                              value={c.id}
-                              checked={c.id === selectedCameraId}
-                              onChange={(e) => {
-                                const id = e.target.value;
-                                setSelectedCameraId(id);
-                              }}
-                            />
-                            <div>{c.label}</div>
-                          </label>
-                        );
-                      })}
-                    </div>
-
-                    <div className="text-center">
-                      <button onClick={() => setShowSettingsModal(false)}>
-                        <PrimaryButton>
-                          <p className="px-4 py-2">Close</p>
-                        </PrimaryButton>
-                      </button>
-                    </div>
-                  </div>
-                </Modal>
               </div>
             )}
           </div>
         </LocalUser>
       </div>
 
+      <Modal
+        openButton={
+          <button onClick={() => setShowSettingsModal(!showSettingsModal)}>
+            <SecondaryButton>
+              <div className="py-2 px-4 flex flex-row gap-2 items-center">
+                <GearIcon size="2em" />
+                <p>Settings</p>
+              </div>
+            </SecondaryButton>
+          </button>
+        }
+        showModal={showSettingsModal}
+      >
+        <div className="p-4 bg-stone-800 rounded-2xl flex flex-col gap-4">
+          <div>
+            <h4 className="font-bold pb-4">Select your video device:</h4>
+            {availableCameras.map((c) => {
+              return (
+                <label key={c.id} className="flex flex-row gap-2">
+                  <input
+                    type="radio"
+                    name="selected-camera"
+                    value={c.id}
+                    checked={c.id === selectedCameraId}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setSelectedCameraId(id);
+                    }}
+                  />
+                  <div>{c.label}</div>
+                </label>
+              );
+            })}
+          </div>
+
+          <div>
+            <h4 className="font-bold pb-4">Blur your background?</h4>
+            <div className="flex flex-row justify-center">
+              <button onClick={handleBlurBackground}>
+                <SecondaryButton>
+                  <p className="px-4 py-2">Yes</p>
+                </SecondaryButton>
+              </button>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <button onClick={() => setShowSettingsModal(false)}>
+              <PrimaryButton>
+                <p className="px-4 py-2">Close</p>
+              </PrimaryButton>
+            </button>
+          </div>
+        </div>
+      </Modal>
+
       {otherHosts.map((host) => {
-        console.log(host);
         return (
           <div
             key={host.uid}

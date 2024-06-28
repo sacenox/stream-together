@@ -22,6 +22,7 @@ export default function useNoiseReduction({
   useEffect(() => {
     const initializeExtension = async () => {
       AgoraRTC.registerExtensions([extension.current]);
+
       if (!extension.current.checkCompatibility()) {
         console.error("Your browser does not support AI Denoiser!");
         return;
