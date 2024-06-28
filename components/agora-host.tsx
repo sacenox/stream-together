@@ -1,20 +1,19 @@
 "use client";
 
-import AgoraRTC, {
+import {
   LocalUser,
   RemoteUser,
   useIsConnected,
   useJoin,
-  useLocalCameraTrack,
-  useLocalMicrophoneTrack,
   usePublish,
   useRemoteUsers,
 } from "agora-rtc-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { ImSpinner10 } from "react-icons/im";
+import { IoEye } from "react-icons/io5";
 
-import useNoiseReduction from "@/hooks/agora-ai-noise-reduction";
-import useVirtualBackground from "@/hooks/agora-virtual-background";
+import useCamera from "@/hooks/use-camera";
+import useMicrophone from "@/hooks/use-microphone";
 import { appId, channel, HOST, OWNER, token } from "@/lib/config";
 
 import EndStreamButton from "./end-stream-button";
@@ -30,69 +29,15 @@ export default function AgoraHost({
   userType,
 }: Readonly<{ userType: number }>) {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
-
   const [callStarted, setCallStarted] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
   const [audioStarted, setAudioStarted] = useState(false);
-
-  const [availableCameras, setAvailableCameras] = useState<
-    { id: string; label: string }[]
-  >([]);
-  const [selectedCameraId, setSelectedCameraId] = useState("");
-
-  useEffect(() => {
-    const getCameras = async () => {
-      const cameras = await AgoraRTC.getCameras();
-      setAvailableCameras(
-        cameras.map((c) => ({ id: c.deviceId, label: c.label })),
-      );
-      // Choose the first one as a default
-      setSelectedCameraId(cameras[0].deviceId);
-    };
-    getCameras();
-  }, []);
-
-  const { localCameraTrack } = useLocalCameraTrack(videoStarted, {
-    cameraId: selectedCameraId,
-  });
-
-  const { localMicrophoneTrack } = useLocalMicrophoneTrack(audioStarted);
-  useNoiseReduction({ localMicrophoneTrack });
-
+  const { localCameraTrack } = useCamera(videoStarted);
+  const { localMicrophoneTrack } = useMicrophone(audioStarted);
   const isConnected = useIsConnected();
-
-  const handleStarCall = useCallback(() => {
-    setCallStarted(true);
-  }, []);
-
-  const handleEndCall = useCallback(() => {
-    setCallStarted(false);
-  }, []);
-
-  const handleToggleAudio = useCallback(() => {
-    setAudioStarted(!audioStarted);
-  }, [audioStarted]);
-
-  const handleToggleVideo = useCallback(() => {
-    setVideoStarted(!videoStarted);
-  }, [videoStarted]);
-
-  const virtualBackgroundRef = useVirtualBackground({ localCameraTrack });
-
-  const handleBlurBackground = useCallback(() => {
-    const enableBlur = async () => {
-      if (virtualBackgroundRef.current?.enabled) {
-        virtualBackgroundRef.current?.disable();
-      } else {
-        virtualBackgroundRef.current?.setOptions({
-          type: "blur",
-          blurDegree: 2,
-        });
-        virtualBackgroundRef.current?.enable();
-      }
-    };
-    void enableBlur();
-  }, [virtualBackgroundRef]);
+  const remoteUsers = useRemoteUsers();
+  const otherHosts = remoteUsers.filter((u) => u.uid === HOST);
+  const guests = remoteUsers.filter((u) => u.uid !== HOST && u.uid !== OWNER);
 
   useJoin(
     {
@@ -106,12 +51,16 @@ export default function AgoraHost({
 
   usePublish([localMicrophoneTrack, localCameraTrack]);
 
-  const remoteUsers = useRemoteUsers();
-  const otherHosts = remoteUsers.filter((u) => u.uid === HOST);
-  const guests = remoteUsers.filter((u) => u.uid !== HOST && u.uid !== OWNER);
+  const handleToggleAudio = useCallback(() => {
+    setAudioStarted(!audioStarted);
+  }, [audioStarted]);
+
+  const handleToggleVideo = useCallback(() => {
+    setVideoStarted(!videoStarted);
+  }, [videoStarted]);
 
   return (
-    <div className="w-full">
+    <div className="w-full flex flex-col justify-center items-center gap-4">
       <div className="flex flex-col md:flex-row gap-8 w-full justify-center items-center">
         <div className="w-full flex flex-col gap-2 max-w-2xl">
           <div className="rounded-3xl overflow-hidden bg-black w-full  aspect-[4/3]">
@@ -122,10 +71,8 @@ export default function AgoraHost({
               micOn={audioStarted}
               playAudio={false}
             >
-              <div className="flex flex-col justify-between h-full p-2">
-                <div className="flex flex-row justify-between">
-                  <p className="p-2">Your broadcast</p>
-
+              <div className="flex flex-col justify-between h-full p-4">
+                <div className="flex flex-row justify-end">
                   <Modal
                     openButton={
                       <SettingsButton
@@ -137,10 +84,8 @@ export default function AgoraHost({
                   >
                     <div className="p-4 bg-stone-800 rounded-2xl flex flex-col gap-4 text-left">
                       <StreamSettings
-                        availableCameras={availableCameras}
-                        selectedCameraId={selectedCameraId}
-                        setSelectedCameraId={setSelectedCameraId}
-                        handleBlurBackground={handleBlurBackground}
+                        audioStarted={audioStarted}
+                        videoStarted={videoStarted}
                       />
 
                       <div className="text-center">
@@ -164,7 +109,9 @@ export default function AgoraHost({
                       videoStarted={videoStarted}
                       handleToggleVideo={handleToggleVideo}
                     />
-                    <EndStreamButton handleEndCall={handleEndCall} />
+                    <EndStreamButton
+                      handleEndCall={() => setCallStarted(false)}
+                    />
                   </div>
                 ) : callStarted ? (
                   <div className="flex flex-col flex-grow items-center justify-center">
@@ -172,7 +119,9 @@ export default function AgoraHost({
                   </div>
                 ) : (
                   <div className="flex flex-row flex-grow justify-center">
-                    <StartStreamButton handleStartCall={handleStarCall} />
+                    <StartStreamButton
+                      handleStartCall={() => setCallStarted(true)}
+                    />
                   </div>
                 )}
               </div>
@@ -186,15 +135,16 @@ export default function AgoraHost({
               key={host.uid}
               className="rounded-3xl overflow-hidden bg-black w-full max-w-2xl aspect-[4/3]"
             >
-              <RemoteUser user={host}>
-                <p className="p-4">{host.uid}</p>
-              </RemoteUser>
+              <RemoteUser user={host} />
             </div>
           );
         })}
       </div>
 
-      <div className="text-center">People watching: {guests?.length ?? 0}</div>
+      <div className="text-center p-8 bg-stone-800 shadow-md shadow-stone-800 rounded-2xl max-w-2xl flex flex-row justify-center gap-2">
+        <IoEye size="1.5em" />
+        <p>Viewers: {guests?.length ?? 0}</p>
+      </div>
     </div>
   );
 }

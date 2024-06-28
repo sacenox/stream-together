@@ -10,7 +10,7 @@ const AgoraGuest = dynamic(() => import("@/components/agora-guest"), {
   ssr: false,
 });
 
-export default function StreamSetupPage() {
+export default function ViewerPage() {
   return (
     <AgoraProvider>
       <div className="flex flex-col items-center gap-16">

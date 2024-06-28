@@ -1,24 +1,52 @@
-import PrimaryButton from "./primary-button";
-import SecondaryButton from "./secondary-button";
+import { useCallback, useState } from "react";
+
+import useVirtualBackground from "@/hooks/agora-virtual-background";
+import useCamera from "@/hooks/use-camera";
+import useMicrophone from "@/hooks/use-microphone";
 
 export default function StreamSettings({
-  availableCameras,
-  selectedCameraId,
-  setSelectedCameraId,
-  // availableMicrophones,
-  // selectedMicrophoneId,
-  // setSelectedMicrophone,
-  handleBlurBackground,
+  audioStarted,
+  videoStarted,
 }: Readonly<{
-  availableCameras: { id: string; label: string }[];
-  selectedCameraId: string;
-  setSelectedCameraId: (agr0: string) => void;
-  handleBlurBackground: () => void;
+  audioStarted: boolean;
+  videoStarted: boolean;
 }>) {
+  const {
+    localCameraTrack,
+    availableCameras,
+    selectedCameraId,
+    setSelectedCameraId,
+  } = useCamera(videoStarted);
+
+  const {
+    availableMicrophones,
+    selectedMicrophoneId,
+    setSelectedMicrophoneId,
+  } = useMicrophone(audioStarted);
+
+  const virtualBackgroundRef = useVirtualBackground({ localCameraTrack });
+  const [backgroundBlurred, setBackgroundBlurred] = useState(false);
+
+  const handleBlurBackground = useCallback(() => {
+    const enableBlur = async () => {
+      if (backgroundBlurred) {
+        virtualBackgroundRef.current?.disable();
+      } else {
+        virtualBackgroundRef.current?.setOptions({
+          type: "blur",
+          blurDegree: 2,
+        });
+        virtualBackgroundRef.current?.enable();
+      }
+    };
+    void enableBlur();
+  }, [virtualBackgroundRef, backgroundBlurred]);
+
   return (
     <>
       <div>
         <h4 className="font-bold pb-4">Select your video device:</h4>
+
         {availableCameras.map((c) => {
           return (
             <label key={c.id} className="flex flex-row gap-2">
@@ -36,17 +64,40 @@ export default function StreamSettings({
             </label>
           );
         })}
+
+        <label className="flex flex-row gap-2 pt-2">
+          <input
+            type="checkbox"
+            onChange={() => {
+              void handleBlurBackground();
+              setBackgroundBlurred(!backgroundBlurred);
+            }}
+          />
+          <p>Blur your background?</p>
+        </label>
       </div>
 
+      <div className="border-t-stone-700 border-t-2"></div>
+
       <div>
-        <h4 className="font-bold pb-4">Blur your background?</h4>
-        <div className="flex flex-row justify-start">
-          <button onClick={handleBlurBackground}>
-            <SecondaryButton>
-              <p className="px-4 py-2">Toggle</p>
-            </SecondaryButton>
-          </button>
-        </div>
+        <h4 className="font-bold pb-4">Select your audio device:</h4>
+        {availableMicrophones.map((m) => {
+          return (
+            <label key={m.id} className="flex flex-row gap-2">
+              <input
+                type="radio"
+                name="selected-microphone"
+                value={m.id}
+                checked={m.id === selectedMicrophoneId}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  setSelectedMicrophoneId(id);
+                }}
+              />
+              <div>{m.label}</div>
+            </label>
+          );
+        })}
       </div>
     </>
   );

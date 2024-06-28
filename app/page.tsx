@@ -17,7 +17,6 @@ export default function Home() {
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setTitle(e.target.value);
-      // Clear the error if it exists after a new change
       if (error) setError("");
     },
     [error, setTitle],
@@ -27,7 +26,7 @@ export default function Home() {
     if (!title) setError("Please tell us the title of your stream first.");
     else {
       const slug = slugify(title);
-      router.push("/" + slug + "/host");
+      router.push("/" + slug + "/stream");
     }
   }, [title, router]);
 

@@ -12,12 +12,11 @@ import { HOST, OWNER } from "@/lib/config";
 const AgoraProvider = dynamic(() => import("@/components/agora-provider"), {
   ssr: false,
 });
-
 const AgoraHost = dynamic(() => import("@/components/agora-host"), {
   ssr: false,
 });
 
-export default function StreamSetupPage() {
+export default function HostPage() {
   const [currentUrl, setCurrentUrl] = useState("");
   const [copied, copy] = useCopyToClipboard();
   const searchParams = useSearchParams();
@@ -34,7 +33,7 @@ export default function StreamSetupPage() {
     <AgoraProvider>
       <div className="flex flex-col items-center gap-16">
         {userType === OWNER && (
-          <div className="max-w-xl w-full text-center">
+          <div className="text-center p-8 bg-stone-800 shadow-md shadow-stone-800 rounded-2xl max-w-xl">
             <p className="text-lg p-2">
               Share this url with your co-host for them to join you!
             </p>
