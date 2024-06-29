@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 
 import Logo from "@/components/logo";
 
-describe("Landing Page (Home)", () => {
+describe("Logo component", () => {
   it("renders the logo", async () => {
     render(<Logo />);
 
