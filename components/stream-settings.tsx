@@ -1,14 +1,3 @@
-import {
-  ICameraVideoTrack,
-  ILocalVideoTrack,
-  IMicrophoneAudioTrack,
-} from "agora-rtc-react";
-import { useCallback, useState } from "react";
-
-import useVirtualBackground from "@/hooks/use-agora-virtual-background";
-import useCamera from "@/hooks/use-camera";
-import useMicrophone from "@/hooks/use-microphone";
-
 export default function StreamSettings({
   availableCameras,
   selectedCameraId,
