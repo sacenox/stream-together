@@ -1,47 +1,39 @@
+import {
+  ICameraVideoTrack,
+  ILocalVideoTrack,
+  IMicrophoneAudioTrack,
+} from "agora-rtc-react";
 import { useCallback, useState } from "react";
 
-import useVirtualBackground from "@/hooks/agora-virtual-background";
+import useVirtualBackground from "@/hooks/use-agora-virtual-background";
 import useCamera from "@/hooks/use-camera";
 import useMicrophone from "@/hooks/use-microphone";
 
 export default function StreamSettings({
-  audioStarted,
-  videoStarted,
+  availableCameras,
+  selectedCameraId,
+  setSelectedCameraId,
+  availableMicrophones,
+  selectedMicrophoneId,
+  setSelectedMicrophoneId,
+  backgroundBlurred,
+  handleBlurBackground,
 }: Readonly<{
-  audioStarted: boolean;
-  videoStarted: boolean;
+  availableCameras: {
+    id: string;
+    label: string;
+  }[];
+  selectedCameraId: string;
+  setSelectedCameraId: (arg0: string) => void;
+  availableMicrophones: {
+    id: string;
+    label: string;
+  }[];
+  selectedMicrophoneId: string;
+  setSelectedMicrophoneId: (arg0: string) => void;
+  backgroundBlurred: boolean;
+  handleBlurBackground: () => void;
 }>) {
-  const {
-    localCameraTrack,
-    availableCameras,
-    selectedCameraId,
-    setSelectedCameraId,
-  } = useCamera(videoStarted);
-
-  const {
-    availableMicrophones,
-    selectedMicrophoneId,
-    setSelectedMicrophoneId,
-  } = useMicrophone(audioStarted);
-
-  const virtualBackgroundRef = useVirtualBackground({ localCameraTrack });
-  const [backgroundBlurred, setBackgroundBlurred] = useState(false);
-
-  const handleBlurBackground = useCallback(() => {
-    const enableBlur = async () => {
-      if (backgroundBlurred) {
-        virtualBackgroundRef.current?.disable();
-      } else {
-        virtualBackgroundRef.current?.setOptions({
-          type: "blur",
-          blurDegree: 2,
-        });
-        virtualBackgroundRef.current?.enable();
-      }
-    };
-    void enableBlur();
-  }, [virtualBackgroundRef, backgroundBlurred]);
-
   return (
     <>
       <div>
@@ -68,10 +60,8 @@ export default function StreamSettings({
         <label className="flex flex-row gap-2 pt-2">
           <input
             type="checkbox"
-            onChange={() => {
-              void handleBlurBackground();
-              setBackgroundBlurred(!backgroundBlurred);
-            }}
+            defaultChecked={backgroundBlurred}
+            onClick={handleBlurBackground}
           />
           <p>Blur your background?</p>
         </label>

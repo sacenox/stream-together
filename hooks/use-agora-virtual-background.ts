@@ -4,7 +4,7 @@ import VirtualBackgroundExtension, {
   IVirtualBackgroundProcessor,
 } from "agora-extension-virtual-background";
 import AgoraRTC, { ICameraVideoTrack } from "agora-rtc-react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function useVirtualBackground({
   localCameraTrack,
@@ -13,6 +13,7 @@ export default function useVirtualBackground({
 }) {
   const extension = useRef(new VirtualBackgroundExtension());
   const processor = useRef<IVirtualBackgroundProcessor>();
+  const [backgroundBlurred, setBackgroundBlurred] = useState(false);
 
   useEffect(() => {
     const initializeExtension = async () => {
@@ -23,7 +24,7 @@ export default function useVirtualBackground({
         return;
       }
 
-      if (localCameraTrack) {
+      if (localCameraTrack && !processor.current) {
         try {
           processor.current = extension.current.createProcessor();
           await processor.current.init();
@@ -48,5 +49,22 @@ export default function useVirtualBackground({
     };
   }, [localCameraTrack]);
 
-  return processor;
+  const handleBlurBackground = useCallback(() => {
+    const enableBlur = async () => {
+      if (processor.current?.enabled) {
+        processor.current?.disable();
+        setBackgroundBlurred(false);
+      } else {
+        processor.current?.setOptions({
+          type: "blur",
+          blurDegree: 2,
+        });
+        processor.current?.enable();
+        setBackgroundBlurred(true);
+      }
+    };
+    void enableBlur();
+  }, [processor]);
+
+  return { backgroundBlurred, handleBlurBackground };
 }

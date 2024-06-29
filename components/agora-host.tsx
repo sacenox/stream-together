@@ -12,6 +12,7 @@ import { useCallback, useState } from "react";
 import { ImSpinner10 } from "react-icons/im";
 import { IoEye } from "react-icons/io5";
 
+import useVirtualBackground from "@/hooks/use-agora-virtual-background";
 import useCamera from "@/hooks/use-camera";
 import useMicrophone from "@/hooks/use-microphone";
 import { appId, channel, HOST, OWNER, token } from "@/lib/config";
@@ -32,8 +33,18 @@ export default function AgoraHost({
   const [callStarted, setCallStarted] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
   const [audioStarted, setAudioStarted] = useState(false);
-  const { localCameraTrack } = useCamera(videoStarted);
-  const { localMicrophoneTrack } = useMicrophone(audioStarted);
+  const {
+    localCameraTrack,
+    availableCameras,
+    selectedCameraId,
+    setSelectedCameraId,
+  } = useCamera(videoStarted);
+  const {
+    localMicrophoneTrack,
+    availableMicrophones,
+    selectedMicrophoneId,
+    setSelectedMicrophoneId,
+  } = useMicrophone(audioStarted);
   const isConnected = useIsConnected();
   const remoteUsers = useRemoteUsers();
   const otherHosts = remoteUsers.filter((u) => u.uid === HOST);
@@ -58,6 +69,10 @@ export default function AgoraHost({
   const handleToggleVideo = useCallback(() => {
     setVideoStarted(!videoStarted);
   }, [videoStarted]);
+
+  const { backgroundBlurred, handleBlurBackground } = useVirtualBackground({
+    localCameraTrack,
+  });
 
   return (
     <div className="w-full flex flex-col justify-center items-center gap-4">
@@ -84,8 +99,16 @@ export default function AgoraHost({
                   >
                     <div className="p-4 bg-stone-800 rounded-2xl flex flex-col gap-4 text-left">
                       <StreamSettings
-                        audioStarted={audioStarted}
-                        videoStarted={videoStarted}
+                        {...{
+                          availableCameras,
+                          selectedCameraId,
+                          setSelectedCameraId,
+                          availableMicrophones,
+                          selectedMicrophoneId,
+                          setSelectedMicrophoneId,
+                          backgroundBlurred,
+                          handleBlurBackground,
+                        }}
                       />
 
                       <div className="text-center">

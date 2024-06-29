@@ -1,7 +1,7 @@
 import AgoraRTC, { useLocalMicrophoneTrack } from "agora-rtc-react";
 import { useEffect, useState } from "react";
 
-import useNoiseReduction from "./agora-ai-noise-reduction";
+import useNoiseReduction from "./use-agora-ai-noise-reduction";
 
 export default function useMicrophone(audioStarted: boolean) {
   const [availableMicrophones, setAvailableMicrophones] = useState<
@@ -11,18 +11,24 @@ export default function useMicrophone(audioStarted: boolean) {
   const [selectedMicrophoneId, setSelectedMicrophoneId] = useState("");
 
   useEffect(() => {
-    const getCameras = async () => {
-      const cameras = await AgoraRTC.getCameras();
+    const getMicrophones = async () => {
+      const microphones = await AgoraRTC.getCameras();
       setAvailableMicrophones(
-        cameras.map((c) => ({ id: c.deviceId, label: c.label })),
+        microphones.map((c) => ({ id: c.deviceId, label: c.label })),
       );
-      setSelectedMicrophoneId(cameras[0].deviceId);
+      setSelectedMicrophoneId(microphones[0].deviceId);
     };
-    void getCameras();
+    void getMicrophones();
   }, []);
 
-  const { localMicrophoneTrack } = useLocalMicrophoneTrack(audioStarted);
+  const { localMicrophoneTrack } = useLocalMicrophoneTrack(audioStarted, {
+    microphoneId: selectedMicrophoneId,
+  });
   useNoiseReduction({ localMicrophoneTrack });
+
+  useEffect(() => {
+    localMicrophoneTrack?.setDevice(selectedMicrophoneId);
+  }, [localMicrophoneTrack, selectedMicrophoneId]);
 
   return {
     localMicrophoneTrack,

@@ -22,6 +22,10 @@ export default function useCamera(videoStarted: boolean) {
     cameraId: selectedCameraId,
   });
 
+  useEffect(() => {
+    localCameraTrack?.setDevice(selectedCameraId);
+  }, [localCameraTrack, selectedCameraId]);
+
   return {
     localCameraTrack,
     availableCameras,
