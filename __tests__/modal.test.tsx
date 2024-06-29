@@ -18,4 +18,20 @@ describe("Modal component", () => {
     );
     expect(modalContent).toBeInTheDocument();
   });
+
+  it("renders only the button", async () => {
+    render(
+      <Modal openButton={<button>open</button>} showModal={false}>
+        <p>Modal content should be visible</p>
+      </Modal>,
+    );
+
+    const openButton = await screen.findByText("open");
+    expect(openButton).toBeInTheDocument();
+
+    const modalContent = await screen.queryByText(
+      "Modal content should be visible",
+    );
+    expect(modalContent).toBeNull();
+  });
 });
